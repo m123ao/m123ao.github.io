@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIX一键Root工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298, #8b3a62, #b22222);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(0, 5, 15, 极.85);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: rgba(0, 10, 30, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 25px 20px 20px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.5);
+        }
+        
+        .title {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #ffd700, #ffb700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            margin-bottom: 10px;
+        }
+        
+        .version {
+            font-size: 16px;
+            color: #aaa;
+        }
+        
+        .content {
+            padding: 30px 25px;
+            min-height: 300px;
+        }
+        
+        .input-section {
+            margin: 25px 0 15px;
+        }
+        
+        input {
+            width: 100%;
+            background: rgba(20, 30, 50, 0.7);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 17px;
+            color: white;
+            outline: none;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        input::placeholder {
+            color: #aaa;
+        }
+        
+        input:focus {
+            border-color: #ffb700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #ffd700, #ff8c00);
+            color: #0a1a30;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 35px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+        }
+        
+        .btn-teal {
+            background: linear-gradient(to right, #0cebeb, #20e3b2);
+            min-width: 170px;
+        }
+        
+        .btn-green {
+            background: linear-gradient(to right, #00c853, #009624);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            opacity: 0.8;
+            animation: pulse-glow 1.5s ease-in-out infinite;
+        }
+        
+        .progress-section {
+            display: none;
+            text-align: center;
+        }
+        
+        .progress-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #ffd700;
+            font-weight: 600;
+       极 }
+        
+        .progress-container {
+            width: 100%;
+            height: 22px;
+            background: rgba(40, 50, 70, 0.8);
+            border-radius: 11px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            position: relative;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(to right, #4facfe, #00f2fe, #ffd700);
+            border-radius: 11px;
+            transition: width 0.2s ease;
+            position: relative;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        .progress-percent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5);
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 30px 0;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            color: #00ff00;
+            margin-bottom: 25px;
+            text-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+        }
+        
+        .success-text {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            margin-bottom: 20px;
+        }
+        
+        .info-text {
+            text-align: center;
+            margin: 15px 0 20px;
+            color: #bbb;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .warning {
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        .error-message {
+            display: none;
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(180, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .error-icon {
+            font-size: 50px;
+            color: #ff3333;
+            margin-bottom: 15px;
+        }
+        
+        .error-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ff9999;
+        }
+        
+        .circle-decoration {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 215, 0, 0.25);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+        }
+        
+        .hide-section {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .hide-list {
+            margin-top: 15px;
+            text-align: left;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hide-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(20, 30, 50, 0.3);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .hide-icon {
+            margin-right: 10px;
+            width: 25px;
+        }
+        
+        .disabled-item {
+            opacity: 0.5;
+        }
+        
+        .countdown-text {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #ffd700;
+        }
+        
+        /* Animations */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(0.95); }
+        }
+        
+        @keyframes pulse-glow {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.4; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        
+        @keyframes fadeOutGreen {
+            0% { background: rgba(76, 175, 80, 0.3); }
+            100% { background: transparent; }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .flash-green {
+            animation: fadeOutGreen 1.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="time" id="currentTime">21:38</div>
+            <div>
+                <i class="fas fa-wifi"></i>
+                <span>5G</span>
+                <i class="fas fa-signal"></i>
+                <span>1.60</span>
+            </div>
+            <div>
+                <span id="batteryLevel">82</span>%
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+        
+        <div class="header">
+            <div class="title">MIX一键Root</div>
+            <div class="version">专业版 v1.1</div>
+        </div>
+        
+        <div class="content">
+            <!-- 输入手机型号部分手机无法root -->
+            <div id="inputSection" class="input-section">
+                <h2>输入您的手机机型信息</h2>
+                <div class="info-text">
+                    支持主流Android机型一键ROOT<br>
+                    请输入完整的手机型号
+                </div>
+                
+                <input type="text" id="modelInput" placeholder="例如: 一加ace5">
+                
+                <div class="btn-container">
+                    <button class="btn" onclick="startRootProcess()">
+                        <span class="btn-glow"></span>
+                        一键ROOT
+                    </button>
+                </div>
+                
+                <div class="info-text warning">
+                    <i class="fas fa-exclamation-triangle"></i> ROOT操作有风险，请确保手机已备份
+                </div>
+            </div>
+            
+            <!-- BL锁未解锁提示 -->
+            <div id="blLockSection" class="error-message">
+                <div class="error-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="error-text">您的设备Bootloader未解锁！</div>
+                <div class="info-text">
+                    检测到您输入的设备: <span id="detectedModel">未知机型</span><br>
+                    需要解锁Bootloader才能继续ROOT操作
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn btn-secondary" onclick="unlockBootloader()">
+                        <span class="btn-glow"></span>
+                        立即解锁BL锁
+                    </button>
+                    <button class="btn" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i> 返回
+                    </button>
+                </div>
+                
+                <div class="info-text warning">
+                    <i class="fas fa-exclamation-triangle"></i> 解锁BL会清除手机所有数据
+                </div>
+            </div>
+            
+            <!-- 解锁BL进度 -->
+            <div id="unlockProgressSection" class="progress-section">
+                <div class="circle-decoration"></div>
+                <div class="progress-text">正在解锁Bootloader...</div>
+                <div class="progress-container">
+                    <div id="unlockProgressBar" class="progress-bar">
+                        <div id="unlockProgressPercent" class="progress-percent">0%</div>
+                    </div>
+                </div>
+                <div class="info-text">
+                    机型: <span id="unlockModel">未知机型</span><br>
+                    此过程大约需要1-2分钟，请保持设备连接
+                </div>
+            </div>
+            
+            <!-- 刷入阿尔法面具进度 -->
+            <div id="alphaProgressSection" class="progress-section">
+                <div class="circle-decoration"></div>
+                <div class="progress-text">正在刷入阿尔法面具...</div>
+                <div class="progress-container">
+                    <div id="alphaProgressBar" class="progress-bar">
+                        <div id="alphaProgressPercent" class="progress-percent">0%</div>
+                    </div>
+                </div>
+                <div class="info-text">
+                    正在适配: <span id="alphaModel">未知机型</span><br>
+                    此过程需要3-5分钟，请勿断开设备
+                </div>
+            </div>
+            
+            <!-- 成功消息 -->
+            <div id="successMessage" class="success-message">
+                <div class="circle-decoration"></div>
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="success-text">当前已获取root</div>
+                <div class="info-text">
+                    设备ROOT权限已获取成功<br>
+                    请手动安装阿尔法面具
+                </div>
+                
+                <!-- 新增的一键隐藏环境按钮 -->
+                <div class="btn-container" style="margin-top: 20px;">
+                    <button class="btn btn-teal" onclick="startHideProcess()">
+                        <span class="btn-glow"></span>
+                        <i class="fas fa-eye-slash"></i> 一键隐藏环境
+                    </button>
+                </div>
+                
+                <div class="info-text warning" style="margin-top: 20px;">
+                    <i class="fas fa-shield-alt"></i> 应用隐藏环境功能可绕过银行/游戏应用检测
+                </div>
+            </div>
+            
+            <!-- 隐藏环境进度 -->
+            <div id="hideProgressSection" class="progress-section">
+                <div class="circle-decoration"></div>
+                <div class="progress-text">正在隐藏ROOT环境...</div>
+                <div class="progress-container">
+                    <div id="hideProgressBar" class="progress-bar">
+                        <div id="hideProgressPercent" class="progress-percent">0%</div>
+                    </div>
+                </div>
+                <div class="info-text">
+                    正在为设备进行root<br>
+                    当前检测ROOT状态
+                   
+                </div>
+                
+                <!-- 必须得隐藏root权限 -->
+                <div class="hide-list">
+                    <div class="hide-item">
+                        <div class="hide-icon">
+                            <i class="fas fa-bank"></i>
+                        </div>
+                        <div>X银行类应用检测😡</div>
+                    </div>
+                    <div class="hide-item">
+                        <div class="hide-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div>X游戏安全环境检测😡</div>
+                    </div>
+                    <div class="hide-item">
+                        <div class="hide-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>X设备完整性检查😡</div>
+                    </div>
+                    <div class="hide-item">
+                        <div class="hide-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div>X隐藏Bootloader😡</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 隐藏环境完成 -->
+            <div id="hideSuccessSection" class="success-message">
+                <div class="circle-decoration"></div>
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="success-text">环境已成功隐藏！</div>
+                <div class="info-text">
+                    ROOT环境已完全隐藏<br>
+                    银行/游戏应用将无法检测ROOT状态
+                </div>
+                
+                <!-- 完成状态图标 -->
+                <div class="hide-list">
+                    <div class="hide-item flash-green">
+                        <div class="hide-icon">
+                            <i class="fas fa-check-circle" style="color:#4CAF50"></i>
+                        </div>
+                        <div>隐藏Magisk应用</div>
+                    </div>
+                    <div class="hide-item flash-green">
+                        <div class="hide-icon">
+                            <i class="fas fa-check-circle" style="color:#4CAF50"></i>
+                        </div>
+                        <div>已配置隐藏应用列表</div>
+                    </div>
+                    <div class="hide-item flash-green">
+                        <div class="hide-icon">
+                            <i class="fas fa-check-circle" style="color:#4CAF50"></i>
+                        </div>
+                        <div>Bootloader己隐藏</div>
+                    </div>
+                    <div class="hide-item flash-green">
+                        <div class="hide-icon">
+                            <i class="fas fa-check-circle" style="color:#4CAF50"></i>
+                        </div>
+                        <div>启用Magisk白名单</div>
+                    </div>
+                </div>
+                
+                <!-- 新增操作状态日志 -->
+                <div class="log-section" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                    <div class="info-text">刷入状态：</div>
+                    <div id="statusLog" style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; max-height: 150px; overflow-y: auto; font-family: monospace; text-align: left; margin: 15px 0;">
+                        <div class="log-entry">> root成功请将手机重启</div>
+                        <div class="log-entry">> 已刷入环境模块...</div>
+                        <div class="log-entry">> 应用隐藏配置</div>
+                    </div>
+                </div>
+                
+                <!-- 返回按钮 -->
+                <div class="btn-container" style="margin-top: 20px;">
+                    <button class="btn btn-green" onclick="goBackToMain()">
+                        <i class="fas fa-home"></i> 返回主界面
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 更新时间
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+        
+        // 更新电池状态
+        function updateBattery() {
+            const battery = Math.floor(Math.random() * 30) + 70;
+            document.getElementById('batteryLevel').textContent = battery;
+        }
+        
+        // 初始化
+        function init() {
+            updateTime();
+            updateBattery();
+            setInterval(updateTime, 60000);
+            setInterval(updateBattery, 300000);
+            
+            // 初始隐藏所有部分
+            document.getElementById('blLockSection').style.display = 'none';
+            document.getElementById('unlockProgressSection').style.display = 'none';
+            document.getElementById('alphaProgressSection').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('hideProgressSection').style.display = 'none';
+            document.getElementById('hideSuccessSection').style.display = 'none';
+        }
+        
+        // 开始Root流程
+        function startRootProcess() {
+            const modelInput = document.getElementById('modelInput').value;
+            if (!modelInput) {
+                document.getElementById('modelInput').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('modelInput').classList.remove('shake');
+                }, 500);
+                return;
+            }
+            
+            // 显示BL锁未解锁提示
+            document.getElementById('inputSection').style.display = 'none';
+            document.getElementById('blLockSection').style.display = 'block';
+            document.getElementById('detectedModel').textContent = modelInput;
+        }
+        
+        // 返回上一步
+        function goBack() {
+            document.getElementById('blLockSection').style.display = 'none';
+            document.getElementById('inputSection').style.display = 'block';
+        }
+        
+        // 解锁BL锁
+        function unlockBootloader() {
+            const model = document.getElementById('detectedModel').textContent;
+            
+            document.getElementById('blLockSection').style.display = 'none';
+            document.getElementById('unlockProgressSection').style.display = 'block';
+            document.getElementById('unlockModel').textContent = model;
+            
+            // 模拟解锁进度
+            let progress = 0;
+            const progressBar = document.getElementById('unlockProgressBar');
+            const progressPercent = document.getElementById('unlockProgressPercent');
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 3;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // 解锁完成，开始刷入阿尔法面具
+                    setTimeout(() => {
+                        document.getElementById('unlockProgressSection').style.display = 'none';
+                        startAlphaProcess();
+                    }, 800);
+                }
+                
+                progressBar.style.width = progress + '%';
+                progressPercent.textContent = Math.round(progress) + '%';
+            }, 200);
+        }
+        
+        // 开始刷入阿尔法面具
+        function startAlphaProcess() {
+            const model = document.getElementById('detectedModel').textContent;
+            
+            document.getElementById('alphaProgressSection').style.display = 'block';
+            document.getElementById('alphaModel').textContent = model;
+            
+            // 模拟刷入进度
+            let progress = 0;
+            const progressBar = document.getElementById('alphaProgressBar');
+            const progressPercent = document.getElementById('alphaProgressPercent');
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 2;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // 刷入完成，显示成功消息
+                    setTimeout(() => {
+                        document.getElementById('alphaProgressSection').style.display = 'none';
+                        document.getElementById('successMessage').style.display = 'block';
+                    }, 800);
+                }
+                
+                progressBar.style.width = progress + '%';
+                progressPercent.textContent = Math.round(progress) + '%';
+                
+                // 模拟关键步骤停顿
+                if (Math.round(progress) === 20) {
+                    progressPercent.textContent = "20% - 正在解压镜像...";
+                } else if (Math.round(progress) === 50) {
+                    progressPercent.textContent = "50% - 写入系统分区...";
+                } else if (Math.round(progress) === 80) {
+                    progressPercent.textContent = "80% - 验证安装...";
+                }
+            }, 300);
+        }
+        
+        // ================= 一键隐藏环境功能 =================
+        function startHideProcess() {
+            // 隐藏成功消息，显示进度界面
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('hideProgressSection').style.display = 'block';
+            
+            // 模拟隐藏环境过程
+            let progress = 0;
+            const progressBar = document.getElementById('hideProgressBar');
+            const progressPercent = document.getElementById('hideProgressPercent');
+            const hideItems = document.querySelectorAll('.hide-item');
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 3;
+                
+                // 根据进度更新日志
+                if (progress > 20 && progress < 25) {
+                    progressPercent.textContent = "正在应用Magisk核心模式...";
+                } else if (progress > 40 && progress < 45) {
+                    progressPercent.textContent = "安装隐藏环境模块...";
+                } else if (progress > 60 && progress < 65) {
+                    progressPercent.textContent = "启用Zygisk保护机制...";
+                } else if (progress > 80 && progress < 85) {
+                    progressPercent.textContent = "注入安全签名...";
+                }
+                
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // 进度完成后显示成功消息
+                    setTimeout(() => {
+                        document.getElementById('hideProgressSection').style.display = 'none';
+                        document.getElementById('hideSuccessSection').style.display = 'block';
+                    }, 800);
+                }
+                
+                progressBar.style.width = progress + '%';
+                
+                // 当进度达到某些点时，显示相应的项目完成状态
+                if (progress > 25) hideItems[0].innerHTML = '<div class="hide-icon"><i class="fas fa-check-circle" style="color:#4CAF50"></i></div><div>银行类应用检测</div>';
+                if (progress > 50) hideItems[1].innerHTML = '<div class="hide-icon"><i class="fas fa-check-circle" style="color:#4CAF50"></i></div><div>游戏安全环境检测</div>';
+                if (progress > 75) hideItems[2].innerHTML = '<div class="hide-icon"><i class="fas fa-check-circle" style="color:#4CAF50"></i></div><div>设备完整性检查</div>';
+                if (progress > 95) hideItems[3].innerHTML = '<div class="hide-icon"><i class="fas fa-check-circle" style="color:#4CAF50"></i></div><div>Bootloader锁定检测</div>';
+                
+            }, 200);
+        }
+        
+        // 返回主界面
+        function goBackToMain() {
+            document.getElementById('hideSuccessSection').style.display = 'none';
+            document.getElementById('inputSection').style.display = 'block';
+            document.getElementById('modelInput').value = '';
+        }
+        
+        // 初始化页面
+        window.onload = init;
+    </script>
+</body>
+</html>
