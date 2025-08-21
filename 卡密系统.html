@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡密系统管理 - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        
+        .login-form, .register-form, .user-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .app-logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .app-logo h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .app-logo p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .form-footer a {
+            color: #3498db;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .notification {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-panel, .user-panel {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .admin-panel h2, .user-panel h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .invite-codes, .user-apps {
+            margin-top: 20px;
+        }
+        
+        .invite-code, .app-card {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        .tab-navigation {
+            display: flex;
+            background-color: #34495e;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        
+        .tab-btn {
+            padding: 12px 20px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .tab-btn.active {
+            background-color: #1abc9c;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-content {
+            color: #666;
+        }
+        
+        .status-active {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .status-expired {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+        
+        .btn-edit {
+            background-color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 登录表单 -->
+        <div class="login-form" id="loginForm">
+            <div class="app-logo">
+                <h1>卡密系统管理</h1>
+                <p>安全可靠的卡密管理系统</p>
+            </div>
+            
+            <div class="notification error" id="loginError"></div>
+            
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" placeholder="请输入用户名">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" placeholder="请输入密码">
+            </div>
+            
+            <button onclick="login()">登录</button>
+            
+            <div class="form-footer">
+                <a onclick="showRegisterForm()">没有账号？使用邀请码注册</a>
+            </div>
+        </div>
+        
+        <!-- 注册表单 -->
+        <div class="register-form" id="registerForm" style="display: none;">
+            <div class="app-logo">
+                <h1>注册新账号</h1>
+                <p>需要有效的邀请码</p>
+            </div>
+            
+            <div class="notification" id="registerNotification"></div>
+            
+            <div class="form-group">
+                <label for="inviteCode">邀请码</label>
+                <input type="text" id="inviteCode" placeholder="请输入邀请码">
+            </div>
+            
+            <div class="form-group">
+                <label for="newUsername">用户名</label>
+                <input type="text" id="newUsername" placeholder="请设置用户名">
+            </div>
+            
+            <div class="form-group">
+                <label for="newPassword">密码</label>
+                <input type="password" id="newPassword" placeholder="请设置密码">
+            </div>
+            
+            <button onclick="register()">注册</button>
+            
+            <div class="form-footer">
+                <a onclick="showLoginForm()">返回登录</a>
+            </div>
+        </div>
+        
+        <!-- 主账号管理面板 -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="user-info" id="userInfo">
+                欢迎，<span id="userDisplayName">管理员</span> | 
+                <a onclick="logout()">退出</a>
+            </div>
+            
+            <h2>管理员控制面板</h2>
+            
+            <div class="form-group">
+                <label for="generateInviteCode">生成邀请码</label>
+                <select id="inviteCodeType">
+                    <option value="high">高级成员</option>
+                    <option value="normal" selected>普通成员</option>
+                    <option value="low">低级成员</option>
+                    <option value="guest">游客</option>
+                </select>
+                <button onclick="generateInviteCode()" style="margin-top: 10px;">生成邀请码</button>
+            </div>
+            
+            <div class="invite-codes">
+                <h3>已生成的邀请码</h3>
+                <div id="inviteCodesList">
+                    <!-- 邀请码列表将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户面板 -->
+        <div class="user-panel" id="userPanel">
+            <div class="user-info" id="userPanelInfo">
+                欢迎，<span id="userPanelDisplayName">用户</span> | 
+                <span id="userLevelDisplay">权限级别</span> |
+                <a onclick="logout()">退出</a>
+            </div>
+            
+            <h2>用户控制面板</h2>
+            
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchUserTab('apps')">应用管理</button>
+               <button class="tab-btn" onclick="switchUserTab('cards')">卡密管理</button>
+                <button class="tab-btn" id="createCardTab" onclick="switchUserTab('create')">生成卡密</button>
+            </div>
+            
+            <div id="apps" class="tab-content active">
+                <h3>已管理应用</h3>
+                <div id="userAppsList">
+                    <!-- 用户应用列表将在这里动态生成 -->
+                </div>
+                
+                <button onclick="showAddAppForm()" id="addAppBtn">添加新应用</button>
+            </div>
+            
+            <div id="cards" class="tab-content">
+                <h3>卡密列表</h3>
+                <div class="form-group">
+                    <input type="text" placeholder="搜索卡密..." oninput="filterCards(this.value)">
+                </div>
+                
+                <div id="userCardsList">
+                    <!-- 用户卡密列表将在这里动态生成 -->
+                </div>
+            </div>
+            
+            <div id="create" class="tab-content">
+                <h3>生成新卡密</h3>
+                <div class="form-group">
+                    <label for="cardApp">选择应用</label>
+                    <select id="cardApp">
+                        <!-- 应用选项将在这里动态生成 -->
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardType">卡密类型</label>
+                    <select id="cardType">
+                        <option value="day">按天卡密</option>
+                        <option value="week">按周卡密</option>
+                        <option value="month">按月卡密</option>
+                        <option value="year">按年卡密</option>
+                        <option value="permanent" id="permanentOption">永久卡密</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardValue">时间值</label>
+                    <input type="number" id="cardValue" value="1" min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardCount">生成数量</label>
+                    <input type="number" id="cardCount" value="1" min="1" max="10">
+                </div>
+                
+                <button onclick="generateUserCard()">生成卡密</button>
+                
+                <div id="generatedCards">
+                    <!-- 生成的卡密将显示在这里 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 预定义主账号
+        const masterAccount = {
+            username: "maobo",
+            password: "maobowen",
+            level: "master"
+        };
+        
+        // 存储用户数据和邀请码
+        let users = JSON.parse(localStorage.getItem('cardSystemUsers')) || [];
+        let inviteCodes = JSON.parse(localStorage.getItem('cardSystemInviteCodes')) || [];
+        let applications = JSON.parse(localStorage.getItem('cardSystemApps')) || [];
+        let cards = JSON.parse(localStorage.getItem('cardSystemCards')) || [];
+        
+        // 如果用户数据为空，添加主账号
+        if (users.length === 0) {
+            users.push(masterAccount);
+            localStorage.setItem('cardSystemUsers', JSON.stringify(users));
+        }
+        
+        // 显示注册表单
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('registerNotification').style.display = 'none';
+        }
+        
+        // 显示登录表单
+        function showLoginForm() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('userPanel').style.display = 'none';
+        }
+        
+        // 登录功能
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                // 登录成功
+                document.getElementById('loginError').style.display = 'none';
+                
+                // 保存当前用户信息到sessionStorage
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // 根据用户权限显示不同面板
+                if (user.level === "master") {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('userDisplayName').textContent = user.username;
+                    loadInviteCodes();
+                } else {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('userPanel').style.display = 'block';
+                    document.getElementById('userPanelDisplayName').textContent = user.username;
+                    
+                    // 显示用户权限级别
+                    let levelText = "";
+                    switch(user.level) {
+                        case "high": levelText = "高级成员"; break;
+                        case "normal": levelText = "普通成员"; break;
+                        case "low": levelText = "低级成员"; break;
+                        case "guest": levelText = "游客"; break;
+                    }
+                    document.getElementById('userLevelDisplay').textContent = levelText;
+                    
+                    // 根据权限级别限制功能
+                    setupUserPermissions(user.level);
+                    
+                    // 加载用户数据
+                    loadUserApps(user.username);
+                    loadUserCards(user.username);
+                    populateAppDropdown(user.username);
+                }
+            } else {
+                // 登录失败
+                document.getElementById('loginError').textContent = "用户名或密码错误！";
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+        
+        // 设置用户权限
+        function setupUserPermissions(level) {
+            const addAppBtn = document.getElementById('addAppBtn');
+            const createCardTab = document.getElementById('createCardTab');
+            const permanentOption = document.getElementById('permanentOption');
+            
+            switch(level) {
+                case "high":
+                    // 高级成员可以使用所有功能
+                    addAppBtn.disabled = false;
+                    createCardTab.disabled = false;
+                    permanentOption.disabled = false;
+                    break;
+                case "normal":
+                    // 普通成员可以使用基本功能
+                    addAppBtn.disabled = false;
+                    createCardTab.disabled = false;
+                    permanentOption.disabled = true;
+                    break;
+                case "low":
+                    // 低级成员功能受限
+                    addAppBtn.disabled = false;
+                    createCardTab.disabled = false;
+                    permanentOption.disabled = true;
+                    break;
+                case "guest":
+                    // 游客只能查看
+                    addAppBtn.disabled = true;
+                    createCardTab.disabled = true;
+                    permanentOption.disabled = true;
+                    break;
+            }
+        }
+        
+        // 注册功能
+        function register() {
+            const inviteCode = document.getElementById('inviteCode').value;
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            
+            // 验证邀请码
+            const codeIndex = inviteCodes.findIndex(code => code.code === inviteCode && !code.used);
+            
+            if (codeIndex === -1) {
+                document.getElementById('registerNotification').textContent = "邀请码无效或已被使用！";
+                document.getElementById('registerNotification').className = "notification error";
+                document.getElementById('registerNotification').style.display = 'block';
+                return;
+            }
+            
+            // 检查用户名是否已存在
+            if (users.some(user => user.username === username)) {
+                document.getElementById('registerNotification').textContent = "用户名已存在！";
+                document.getElementById('registerNotification').className = "notification error";
+                document.getElementById('registerNotification').style.display = 'block';
+                return;
+            }
+            
+            // 创建新用户
+            const userLevel = inviteCodes[codeIndex].level;
+            const newUser = {
+                username: username,
+                password: password,
+                level: userLevel
+            };
+            
+            // 更新数据
+            users.push(newUser);
+            inviteCodes[codeIndex].used = true;
+            inviteCodes[codeIndex].usedBy = username;
+            
+            // 保存到localStorage
+            localStorage.setItem('cardSystemUsers', JSON.stringify(users));
+            localStorage.setItem('cardSystemInviteCodes', JSON.stringify(inviteCodes));
+            
+            document.getElementById('registerNotification').textContent = "注册成功！请登录。";
+            document.getElementById('registerNotification').className = "notification success";
+            document.getElementById('registerNotification').style.display = 'block';
+            
+            // 清空表单
+            document.getElementById('inviteCode').value = "";
+            document.getElementById('newUsername').value = "";
+            document.getElementById('newPassword').value = "";
+            
+            // 2秒后返回登录页
+            setTimeout(showLoginForm, 2000);
+        }
+        
+        // 生成邀请码
+        function generateInviteCode() {
+            const level = document.getElementById('inviteCodeType').value;
+            const code = generateRandomCode(12);
+            
+            const newCode = {
+                code: code,
+                level: level,
+                used: false,
+                usedBy: "",
+                createdAt: new Date().toLocaleString()
+            };
+            
+            inviteCodes.push(newCode);
+            localStorage.setItem('cardSystemInviteCodes', JSON.stringify(inviteCodes));
+            
+            loadInviteCodes();
+        }
+        
+        // 加载邀请码列表
+        function loadInviteCodes() {
+            const codesList = document.getElementById('inviteCodesList');
+            codesList.innerHTML = "";
+            
+            inviteCodes.forEach(code => {
+                const codeDiv = document.createElement('div');
+                codeDiv.className = 'invite-code';
+                
+                let levelText = "";
+                switch(code.level) {
+                    case "high": levelText = "高级成员"; break;
+                    case "normal": levelText = "普通成员"; break;
+                    case "low": levelText = "低级成员"; break;
+                    case "guest": levelText = "游客"; break;
+                }
+                
+                let statusText = code.used ? 
+                    `<span style="color: #e74c3c;">已使用 (${code.usedBy})</span>` : 
+                    `<span style="color: #27ae60;">未使用</span>`;
+                
+                codeDiv.innerHTML = `
+                    <div>
+                        <strong>${code.code}</strong><br>
+                        <small>${levelText} | 创建: ${code.createdAt}</small>
+                    </div>
+                    <div>${statusText}</div>
+                `;
+                
+                codesList.appendChild(codeDiv);
+            });
+        }
+        
+        // 加载用户应用
+        function loadUserApps(username) {
+            const userAppsList = document.getElementById('userAppsList');
+            userAppsList.innerHTML = "";
+            
+            const userApps = applications.filter(app => app.owner === username);
+            
+            if (userApps.length === 0) {
+                userAppsList.innerHTML = "<p>您还没有添加任何应用</p>";
+                return;
+            }
+            
+            userApps.forEach(app => {
+                const appDiv = document.createElement('div');
+                appDiv.className = 'card';
+                
+                appDiv.innerHTML = `
+                    <div class="card-header">
+                        <span>${app.name}</span>
+                        <span class="status-active">已激活</span>
+                    </div>
+                    <div class="card-content">
+                        <p>包名: ${app.package}</p>
+                        <p>版本: ${app.version}</p>
+                        <p>卡密数量: ${cards.filter(card => card.appId === app.id).length}</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-edit">编辑</button>
+                        <button class="btn-delete" onclick="deleteApp('${app.id}')">删除</button>
+                    </div>
+                `;
+                
+                userAppsList.appendChild(appDiv);
+            });
+        }
+        
+        // 加载用户卡密
+        function loadUserCards(username) {
+            const userCardsList = document.getElementById('userCardsList');
+            userCardsList.innerHTML = "";
+            
+            // 获取用户的所有应用ID
+            const userAppIds = applications
+                .filter(app => app.owner === username)
+                .map(app => app.id);
+            
+            // 获取这些应用的所有卡密
+            const userCards = cards.filter(card => userAppIds.includes(card.appId));
+            
+            if (userCards.length === 0) {
+                userCardsList.innerHTML = "<p>您还没有生成任何卡密</p>";
+                return;
+            }
+            
+            userCards.forEach(card => {
+                const app = applications.find(app => app.id === card.appId);
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card';
+                
+                const statusClass = card.status === 'active' ? 'status-active' : 'status-expired';
+                const statusText = card.status === 'active' ? '有效' : '已过期';
+                
+                cardDiv.innerHTML = `
+                    <div class="card-header">
+                        <span>${card.code}</span>
+                        <span class="${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="card-content">
+                        <p>应用: ${app ? app.name : '未知应用'}</p>
+                        <p>类型: ${getCardTypeText(card.type)}</p>
+                        <p>生成时间: ${card.createdAt}</p>
+                        <p>${card.type !== 'permanent' ? `有效期: ${card.duration}天` : '永久有效'}</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-edit">编辑</button>
+                        <button class="btn-delete" onclick="deleteCard('${card.id}')">删除</button>
+                    </div>
+                `;
+                
+                userCardsList.appendChild(cardDiv);
+            });
+        }
+        
+        // 获取卡密类型文本
+        function getCardTypeText(type) {
+            switch(type) {
+                case 'day': return '按天卡密';
+                case 'week': return '按周卡密';
+                case 'month': return '按月卡密';
+                case 'year': return '按年卡密';
+                case 'permanent': return '永久卡密';
+                default: return '未知类型';
+            }
+        }
+        
+        // 填充应用下拉框
+        function populateAppDropdown(username) {
+            const cardAppSelect = document.getElementById('cardApp');
+            cardAppSelect.innerHTML = "";
+            
+            const userApps = applications.filter(app => app.owner === username);
+            
+            if (userApps.length === 0) {
+                cardAppSelect.innerHTML = "<option value=''>请先添加应用</option>";
+                return;
+            }
+            
+            userApps.forEach(app => {
+                const option = document.createElement('option');
+                option.value = app.id;
+                option.textContent = app.name;
+                cardAppSelect.appendChild(option);
+            });
+        }
+        
+        // 生成用户卡密
+        function generateUserCard() {
+            const appId = document.getElementById('cardApp').value;
+            const type = document.getElementById('cardType').value;
+            const value = parseInt(document.getElementById('cardValue').value);
+            const count = parseInt(document.getElementById('cardCount').value);
+            
+            if (!appId) {
+                alert("请先添加应用");
+                return;
+            }
+            
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const userLevel = currentUser.level;
+            
+            // 检查权限
+            if (userLevel === 'low' && count > 1) {
+                alert("低级成员每次只能生成一个卡密");
+                return;
+            }
+            
+            if (type === 'permanent' && userLevel !== 'high' && userLevel !== 'master') {
+                alert("您的权限不能生成永久卡密");
+                return;
+            }
+            
+            const generatedCardsDiv = document.getElementById('generatedCards');
+            generatedCardsDiv.innerHTML = "<h4>生成的卡密:</h4>";
+            
+            for (let i = 0; i < count; i++) {
+                const code = generateRandomCode(16);
+                let duration = 0;
+                
+                // 计算有效期
+                switch(type) {
+                    case 'day': duration = value; break;
+                    case 'week': duration = value * 7; break;
+                    case 'month': duration = value * 30; break;
+                    case 'year': duration = value * 365; break;
+                    case 'permanent': duration = 36500; break; // 100年视为永久
+                }
+                
+                // 创建卡密对象
+                const newCard = {
+                    id: generateRandomCode(8),
+                    code: code,
+                    appId: appId,
+                    type: type,
+                    duration: duration,
+                    status: 'active',
+                    createdAt: new Date().toLocaleString(),
+                    createdBy: currentUser.username
+                };
+                
+                // 保存卡密
+                cards.push(newCard);
+                
+                // 显示卡密
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card';
+                cardDiv.innerHTML = `
+                    <div class="card-header">
+                        <span>${code}</span>
+                        <span class="status-active">有效</span>
+                    </div>
+                    <div class="card-content">
+                        <p>类型: ${getCardTypeText(type)}</p>
+                        <p>${type !== 'permanent' ? `有效期: ${duration}天` : '永久有效'}</p>
+                    </div>
+                `;
+                
+                generatedCardsDiv.appendChild(cardDiv);
+            }
+            
+            // 保存到localStorage
+            localStorage.setItem('cardSystemCards', JSON.stringify(cards));
+        }
+        
+        // 显示添加应用表单
+        function showAddAppForm() {
+            const appName = prompt("请输入应用名称:");
+            if (!appName) return;
+            
+            const appPackage = prompt("请输入应用包名:");
+            if (!appPackage) return;
+            
+            const appVersion = prompt("请输入应用版本:");
+            if (!appVersion) return;
+            
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            
+            // 检查用户权限和应用数量限制
+            const userApps = applications.filter(app => app.owner === currentUser.username);
+            
+            if (currentUser.level === 'low' && userApps.length >= 1) {
+                alert("低级成员只能添加一个应用");
+                return;
+            }
+            
+            // 创建应用对象
+            const newApp = {
+                id: generateRandomCode(8),
+                name: appName,
+                package: appPackage,
+                version: appVersion,
+                owner: currentUser.username,
+                createdAt: new Date().toLocaleString()
+            };
+            
+            // 保存应用
+            applications.push(newApp);
+            localStorage.setItem('cardSystemApps', JSON.stringify(applications));
+            
+            // 刷新应用列表
+            loadUserApps(currentUser.username);
+            populateAppDropdown(currentUser.username);
+            
+            alert("应用添加成功!");
+        }
+        
+        // 删除应用
+        function deleteApp(appId) {
+            if (!confirm("确定要删除这个应用吗？相关的所有卡密也将被删除")) {
+                return;
+            }
+            
+            // 删除应用
+            applications = applications.filter(app => app.id !== appId);
+            
+            // 删除相关卡密
+            cards = cards.filter(card => card.appId !== appId);
+            
+            // 保存更改
+            localStorage.setItem('cardSystemApps', JSON.stringify(applications));
+            localStorage.setItem('cardSystemCards', JSON.stringify(cards));
+            
+            // 刷新界面
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            loadUserApps(currentUser.username);
+            loadUserCards(currentUser.username);
+            populateAppDropdown(currentUser.username);
+        }
+        
+        // 删除卡密
+        function deleteCard(cardId) {
+            if (!confirm("确定要删除这个卡密吗？")) {
+                return;
+            }
+            
+            // 删除卡密
+            cards = cards.filter(card => card.id !== cardId);
+            
+            // 保存更改
+            localStorage.setItem('cardSystemCards', JSON.stringify(cards));
+            
+            // 刷新界面
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            loadUserCards(currentUser.username);
+        }
+        
+        // 切换用户面板标签
+        function switchUserTab(tabName) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 取消所有标签按钮的激活状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 激活选中的标签
+            document.getElementById(tabName).classList.add('active');
+            
+            // 激活对应的按钮
+            document.querySelector(`.tab-btn[onclick="switchUserTab('${tabName}')"]`).classList.add('active');
+        }
+        
+        // 生成随机代码
+        function generateRandomCode(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        // 退出登录
+        function logout() {
+            sessionStorage.removeItem('currentUser');
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('userPanel').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+        
+        // 检查是否已登录
+        function checkLogin() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (currentUser) {
+                if (currentUser.level === "master") {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('userDisplayName').textContent = currentUser.username;
+                    loadInviteCodes();
+                } else {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('userPanel').style.display = 'block';
+                    document.getElementById('userPanelDisplayName').textContent = currentUser.username;
+                    
+                    // 显示用户权限级别
+                    let levelText = "";
+                    switch(currentUser.level) {
+                        case "high": levelText = "高级成员"; break;
+                        case "normal": levelText = "普通成员"; break;
+                        case "low": levelText = "低级成员"; break;
+                        case "guest": levelText = "游客"; break;
+                    }
+                    document.getElementById('userLevelDisplay').textContent = levelText;
+                    
+                    // 根据权限级别限制功能
+                    setupUserPermissions(currentUser.level);
+                    
+                    // 加载用户数据
+                    loadUserApps(currentUser.username);
+                    loadUserCards(currentUser.username);
+                    populateAppDropdown(currentUser.username);
+                }
+            }
+        }
+        
+        // 页面加载时检查登录状态
+        window.onload = checkLogin;
+    </script>
+</body>
+</html>
